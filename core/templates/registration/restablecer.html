@@ -1,0 +1,52 @@
+{% extends 'registration/r_base.html' %}
+
+{% block contenido %}
+{% load static %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header bg-gradient-secondary"><h3 class="text-center text-white my-4">Recuperacion de contraseña</h3></div>
+            <div class="card-body">
+                <div class="small mb-3 text-muted">Ingrese su Documento y Correo electrónico para poder restablecer su contraseña</div>
+
+                <form method="post" action="{% url 'restablecer' %}">
+                    {% csrf_token %}
+                    <label for="documento">Documento</label>                    
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="documento" name="documento" type="text" maxlength="10" required autocomplete="off">
+                        <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
+                    </div>
+                    <label for="correo">Correo Electrónico</label>
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="correo" name="correo" type="email" required autocomplete="off">
+                        <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                    </div>
+                    <button class="btn btn-primary mt-3" type="submit">Restablecer Contraseña</button>
+                    <a href="{% url 'login' %}" class="btn btn-danger mt-3 ml-2">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let documentoInput = document.getElementById('documento');
+
+        // Configuración de la máscara del documento
+        documentoInput.addEventListener('input', function (e) {
+            let value = this.value.toUpperCase().replace(/[^VEJ0-9]/g, '');  // Solo permite V, E, J y números
+            if (value.length > 1) {
+                value = value.replace(/^([VEJ]?)-?(\d{0,8})$/, function (match, letter, number) {
+                    letter = letter || 'V';  // Valor por defecto 'V'
+                    return letter + - + number;
+                });
+            }
+            this.value = value;
+        });
+        
+    });
+</script>
+
+{% endblock %}

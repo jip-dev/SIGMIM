@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block titulo %} Crear MIM {% endblock %}
+
+{% block contenido %}
+
+<div class="card shadow mb-4 w-75 mx-auto">
+    <div class="card-header bg-dark"> 
+        <div class="row">
+          <div class="col-4">
+            <a name="" id="" class="btn btn-danger btn-sm" href="{% url 'c_listar' %}" role="button"><strong>Cancelar</strong></a>
+          </div>
+          <h5 class="col-4 m-0 mt-2 ml-5 font-weight-bold text-white text-center">Editar Categoría</h5>
+          <div class="col-4"></div>
+        </div>
+      </div>
+    <div class="card-body">    
+        {% include 'form.html' %}
+    </div>
+</div>
+
+{% endblock %}

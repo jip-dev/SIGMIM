@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block titulo %} SIGMIM | R. Suministros {% endblock %}
+
+{% block contenido %} 
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-dark">
+        <div class="form-row d-flex">
+            <div class="col-4"></div>
+            <h5 class="col-4 m-0 font-weight-bold mt-2 text-white text-center">Reporte de Suministros</h5>
+            <div class="col-4">
+                <a href="{% url 'generar_pdf_all' %}" class="btn btn-success btn-sm float-right" target="_blank">
+                    <strong>Exportar Todo</strong> <i class="fa fa-file-pdf"></i>
+                </a>
+            </div>     
+        </div>   
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" style="width:100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th>Proveedor</th>
+                        <th>Usuario Registrador</th>
+                        <th>Lote</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in suministros %}
+                    <tr class="text-center">
+                        <td>{{ s.Proveedor.RazonSocial }}</td>
+                        <td>{{ s.Usuario }}</td>
+                        <td>{{ s.Lote }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a href="{% url 'generar_pdf' s.IdSuministro %}" 
+                                class="btn btn-success" target="_blank">
+                                <strong>Exportar</strong> <i class="fa fa-file-pdf"></i></a>
+                            </div>                    
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

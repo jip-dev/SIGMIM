@@ -1,0 +1,64 @@
+{% extends 'registration/r_base.html' %}
+
+{% block contenido %}
+{% load static %}
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10 col-md-10">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <!-- Imagen solo visible en pantallas grandes -->
+                    <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center p-0" style="background-image: linear-gradient(15deg, #527af0 20%, #224abe 100%);">
+                        <img alt="hospital humnt" src="{% static 'img/hospital.webp' %}" 
+                             style="width: 320px;"/>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="p-5 md-4">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Bienvenido</h1>
+                            </div>
+                            <form method="POST" action="{% url 'login' %}">
+                                {% csrf_token %}
+                                <label for="email">Correo Electrónico</label>
+                                <div class="input-group mb-3">                                    
+                                    <input type="email" name="username" id="email" class="form-control" required>
+                                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                </div>
+                                <label for="password">Contraseña</label>
+                                <div class="input-group mb-4">
+                                    <input type="password" name="password" id="password" class="form-control" required>
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+                                <hr>
+                                <div class="text-center mt-2 mb-2">
+                                    <a class="text-primary" href="{% url 'restablecer' %}"><strong>¿Olvidaste tu contraseña?</strong></a>
+                                </div>
+
+                                {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="text-center py-3 justify-content-center">
+                                    <p class="text-primary mb-0 small">Todos los derechos reservados &copy;</>
+                                    <p class="text-danger ml-1 small"><b>Proyecto Socio Tecnológico UPTNM "Ludovico Silva" 2023</b></p>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block titulo %}SIGMIM | Solicitud{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-5 offset-md-3">
+            <div class="card text-center shadow-sm mb-3 
+                {% if user.departamento_set.first.IdEstadoDpto.IdEstadoDpto == 2 %} border-warning
+                {% else %} border-success  
+                {% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-building"></i> 
+                        Dpto: {{ user.departamento_set.first.Departamento }}
+                    </h5>
+                    <p class="card-text">
+                        <strong>Piso:</strong> {{ user.departamento_set.first.IdPiso.Descripcion }} <br>
+                        <strong>Estado:</strong> {{ user.departamento_set.first.IdEstadoDpto.Descripcion }}
+                    </p>
+                    <a href="{% if user.departamento_set.first.IdEstadoDpto.IdEstadoDpto == 2 %}
+                                {% url 'detalle_despacho' user.departamento_set.first.IdDpto %}
+                             {% else %}
+                                {% url 'detalle_solicitud' user.departamento_set.first.IdDpto %}
+                             {% endif %}" 
+                       class="btn 
+                       {% if user.departamento_set.first.IdEstadoDpto.IdEstadoDpto == 2 %} btn-warning
+                       {% else %} btn-success 
+                       {% endif %} 
+                       w-100">
+                       {% if user.departamento_set.first.IdEstadoDpto.IdEstadoDpto == 2 %} Visualizar 
+                       {% else %} Solicitar {% endif %}
+                       &nbsp; <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+
+{% endblock %}

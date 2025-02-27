@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block titulo %} SIGMIM | Solicitud {% endblock %}
+
+{% block contenido %}   
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-dark">
+        <div class="row">
+            <div class="col-4">
+                <a class="btn btn-danger btn-sm" href="{% url 'cancelar_solicitud' %}" role="button"><strong>Cancelar</strong></a>
+            </div>
+            <h5 class="col-4 m-0 mt-2 font-weight-bold text-white text-center">Registrar Nueva Solicitud</h5>
+            <div class="col-4"></div>
+        </div>
+    </div>
+    <div class="card-body">
+        <h4>Detalle del Departamento</h4>
+        <form method="POST" id="solicitud-form">
+            {% csrf_token %}
+            <div class="form-row d-flex">
+                <div class="col">
+                    <label for="departamento">Departamento:</label>
+                    <input type="text" id="departamento" class="form-control" value="{{ departamento.Departamento }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="jefe_dpto">Jefe Dpto.:</label>
+                    <input type="text" id="jefe_dpto" class="form-control" value="{{ departamento.JefeDpto }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="piso">Piso:</label>
+                    <input type="text" id="piso" class="form-control" value="{{ departamento.IdPiso.Descripcion }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="usuario_registrador">Registrador:</label>
+                    <input type="text" id="usuario_registrador" class="form-control" disabled
+                           value="{{ request.user.first_name }} {{ request.user.last_name }} - {{ request.user.Documento }}">
+                </div>
+            </div>
+            
+            <h4 class="mt-4">Detalle de la Solicitud</h4>
+            <div class="form-row d-flex">
+                <div class="col">
+                    <label for="codigo">Código:</label>
+                    <select id="codigo" class="form-control">
+                        <option value="" disabled selected>Seleccione un Código</option>
+                        {% for mim in mim_list %}
+                            <option value="{{ mim.IdMIM }}" 
+                                    data-nombre="{{ mim.Nombre }}"
+                                    data-categoria="{{ mim.IdCategoria.Descripcion }}"
+                                    data-formato="{{ mim.IdFormato.Descripcion }}"
+                                    data-stock="{{ mim.Stock }}">
+                                {{ mim.Cod }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="mim">MIM:</label>
+                    <select id="mim" class="form-control">
+                        <option value="" disabled selected>Seleccione un MIM</option>
+                        {% for mim in mim_list %}
+                            <option value="{{ mim.IdMIM }}" 
+                                    data-codigo="{{ mim.Cod }}"
+                                    data-categoria="{{ mim.IdCategoria.Descripcion }}"
+                                    data-formato="{{ mim.IdFormato.Descripcion }}"
+                                    data-stock="{{ mim.Stock }}">
+                                {{ mim.Nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="categoria">Categoría:</label>
+                    <input type="text" id="categoria" class="form-control" disabled>
+                </div>                
+            </div>
+            <div class="form-row mt-3 d-flex">
+                <div class="col">
+                    <label for="formato">Formato:</label>
+                    <input type="text" id="formato" class="form-control" disabled>
+                </div>
+                <div class="col">
+                    <label for="stock">Stock:</label>
+                    <input type="number" id="stock" class="form-control" disabled>
+                </div>
+                <div class="col">
+                    <label for="cantidad">Cantidad:</label>
+                    <input type="number" id="cantidad" class="form-control" min="1" placeholder="Cantidad" required>
+                </div>
+                <div class="col align-self-end">
+                    <button type="button" id="agregar" class="btn btn-primary"><strong>Agregar</strong></button>
+                </div>
+            </div>
+
+            <div class="table-responsive mt-4">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr class="text-center">
+                            <th>#</th>
+                            <th>MIM</th>
+                            <th>Categoría</th>
+                            <th>Formato</th>
+                            <th>Cantidad</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalle-solicitud">
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" id="finalizar" class="btn btn-success mt-3"><strong>Finalizar</strong></button>
+        </form>
+    </div>    
+</div>
+
+<script>
+    // Cuando se selecciona un código
+    document.getElementById('codigo').addEventListener('change', function () {
+        const codigoSelect = this;
+        const selectedOption = codigoSelect.options[codigoSelect.selectedIndex];
+    
+        // Obtener los valores del código seleccionado
+        const mimId = selectedOption.value;
+        const categoria = selectedOption.getAttribute('data-categoria');
+        const formato = selectedOption.getAttribute('data-formato');
+        const stock = selectedOption.getAttribute('data-stock');
+    
+        // Rellenar los valores relacionados
+        document.getElementById('mim').value = mimId;
+        document.getElementById('categoria').value = categoria;
+        document.getElementById('formato').value = formato;
+        document.getElementById('stock').value = stock;
+    });
+    
+    // Cuando se selecciona un MIM
+    document.getElementById('mim').addEventListener('change', function () {
+        const mimSelect = this;
+        const selectedOption = mimSelect.options[mimSelect.selectedIndex];
+    
+        // Obtener los valores del MIM seleccionado
+        const codigo = selectedOption.getAttribute('data-codigo');
+        const categoria = selectedOption.getAttribute('data-categoria');
+        const formato = selectedOption.getAttribute('data-formato');
+        const stock = selectedOption.getAttribute('data-stock');
+    
+        // Rellenar los valores relacionados
+        document.getElementById('codigo').value = selectedOption.value;
+        document.getElementById('categoria').value = categoria;
+        document.getElementById('formato').value = formato;
+        document.getElementById('stock').value = stock;
+    });
+    
+    // Agregar el MIM seleccionado a la tabla
+    document.getElementById('agregar').addEventListener('click', function () {
+        const codigoSelect = document.getElementById('codigo');
+        const mimSelect = document.getElementById('mim');
+        const categoriaInput = document.getElementById('categoria');
+        const formatoInput = document.getElementById('formato');
+        const stockInput = document.getElementById('stock');
+        const cantidadInput = document.getElementById('cantidad');
+
+        if (!codigoSelect.value || !cantidadInput.value || cantidadInput.value <= 0) {
+            alert('Debe completar todos los campos correctamente.');
+            return;
+        }
+
+        const stockDisponible = parseInt(stockInput.value);
+        const cantidadSolicitada = parseInt(cantidadInput.value);
+
+        if (cantidadSolicitada > stockDisponible) {
+            alert('La cantidad solicitada no puede ser mayor al stock disponible.');
+            return;
+        }
+
+        // Verificar si el MIM ya está agregado en la tabla
+        let mimExists = false;
+        document.querySelectorAll('#detalle-solicitud input[name="detalle_mim[]"]').forEach(input => {
+            if (input.value === mimSelect.value) {
+                mimExists = true;
+            }
+        });
+
+        if (mimExists) {
+            alert('Este MIM ya ha sido agregado a la solicitud.');
+            return;
+        }
+
+        // Crear una nueva fila en la tabla
+        const tableBody = document.getElementById('detalle-solicitud');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center">
+                <input type="hidden" name="detalle_codigo[]" value="${codigoSelect.value}">
+                ${codigoSelect.options[codigoSelect.selectedIndex].text}
+            </td>
+            <td class="text-center">
+                <input type="hidden" name="detalle_mim[]" value="${mimSelect.value}">
+                ${mimSelect.options[mimSelect.selectedIndex].text}
+            </td>
+            <td class="text-center">${categoriaInput.value}</td>
+            <td class="text-center">${formatoInput.value}</td>
+            <td class="text-center">
+                <input type="hidden" name="cantidad[]" value="${cantidadInput.value}">
+                ${cantidadInput.value}
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-danger btn-sm eliminar"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+
+        // Actualizar stock temporalmente en la interfaz
+        stockInput.value = stockDisponible - cantidadSolicitada;
+
+        // Limpiar campos
+        codigoSelect.value = '';
+        mimSelect.value = '';
+        categoriaInput.value = '';
+        formatoInput.value = '';
+        stockInput.value = '';
+        cantidadInput.value = '';
+    });
+
+    
+    // Eliminar filas de la tabla
+    document.getElementById('detalle-solicitud').addEventListener('click', function (e) {
+        if (e.target.classList.contains('eliminar')) {
+            e.target.closest('tr').remove();
+        }
+    });
+    
+    // Enviar el formulario
+    document.getElementById('finalizar').addEventListener('click', function () {
+        if (document.getElementById('detalle-solicitud').rows.length === 0) {
+            alert('Debe agregar al menos un MIM antes de finalizar.');
+            return;
+        }
+        document.getElementById('solicitud-form').submit();
+    });
+</script>
+    
+
+{% endblock %}

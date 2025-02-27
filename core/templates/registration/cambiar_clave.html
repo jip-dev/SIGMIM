@@ -1,0 +1,33 @@
+{% extends 'registration/r_base.html' %}
+
+{% block contenido %}
+{% load static %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header"><h3 class="text-center font-weight-normal my-4">Cambiar de contraseña</h3></div>
+            <div class="card-body">
+                <div class="mb-3 text-muted">Coloque y confirme su nueva contraseña para poder continuar</div>
+
+                <form method="post" action="{% url 'cambiar_clave' %}">
+                    {% csrf_token %}
+                    <label for="nuevaclave">Nueva Contraseña</label>
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="nuevaclave" name="nuevaclave" type="password" required>
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    </div>
+                    <label for="confirmarclave">Confirmar Contraseña</label>
+                    <div class="input-group mb-3">           
+                        <input class="form-control" id="confirmarclave" name="confirmarclave" type="password" required>
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    </div>
+                    <button class="btn btn-primary mt-3" type="submit">Cambiar Contraseña</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

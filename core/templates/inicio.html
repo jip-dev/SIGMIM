@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block titulo %} HUMNT | SIGMIM {% endblock %}
+
+{% block contenido %}
+{% load static %}
+<div class="container mt-2">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <h1 class="h3 mb-0 text-gray-800"><strong>Panel de Gestión de Datos</strong></h1>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">       
+
+        <!-- Total MIM -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2" style="background-color:#0d6efd;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="font-weight-bold text-white text-uppercase mb-1">
+                                <strong>Total MIM</strong>
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-white">
+                                {{ total_mim }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-notes-medical fa-2x text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Departamentos -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2" style="background-color:#198754;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="font-weight-bold text-white text-uppercase mb-1">
+                                <strong>Total Departamentos</strong>
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-white">
+                                {{ total_departamentos }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clinic-medical fa-2x text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Departamentos con Solicitud -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100 py-2" style="background-color:#dc3545;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="font-weight-bold text-white text-uppercase mb-1">
+                                <strong>Dptos con Solicitud</strong>
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-white">
+                                {{ dptos_con_solicitud }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hand-holding-medical fa-2x text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Descripción</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-xl-7 col-md-7 mb-2 tex-">
+                    
+                    <p class="text-justify text-dark" style="font-size: 1.25rem;"><strong>SIGMIM</strong> es el Sistema Integral de Gestión de Medicamentos e Insumos Médicos 
+                        del Hospital Universitario Dr. Manuel Núñez Tovar en Maturín Estado Monagas, el mismo ha sido de Desarrollado en el Lenguaje de Programación
+                        de Python utilizando el Framework de Desarrollo Web Django, sus autores son: José Padrón, María Martínez y Franco Bucciarelli, estudiantes de 
+                        UPTNM "Ludovico Silva" en el período 2023-2025.
+                    </p>
+                </div>
+                <div class="col-xl-5 col-md-5 mb-2 text-center">
+                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
+                    src="{% static 'img/undraw_posting_photo.svg' %}" alt="...">
+                </div>                
+            </div>    
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

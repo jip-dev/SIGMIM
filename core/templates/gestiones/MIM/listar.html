@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block titulo %} SIGMIM | MIM {% endblock %}
+
+{% block contenido %} 
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-dark">
+        <div class="form-row d-flex">
+            <div class="col-4">
+                <a name="" id="" class="btn btn-success btn-sm float-left" href="{% url 'MIM_crear' %}" role="button"><strong>Crear Nuevo</strong></a>
+            </div>
+            <h5 class="col-4 m-0 font-weight-bold mt-2 text-white text-center">Listado de MIM</h5>
+            <div class="col-4">
+                <a href="{% url 'generar_MIM_all' %}" class="btn btn-success btn-sm float-right" target="_blank">
+                    <strong>Exportar</strong> <i class="fa fa-file-pdf"></i>
+                </a>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" style="width:100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Formato</th>
+                        <th>Stock</th>
+                        {% if user.is_authenticated %}
+                            {% if user.IdRol.Descripcion == "Administrador" %}
+                        <th>Acciones</th>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in MIM %}
+                    <tr class="text-center">
+                        <td>{{ m.Cod }}</td>
+                        <td>{{ m.Nombre }}</td>
+                        <td>{{ m.IdCategoria }}</td>
+                        <td>{{ m.IdFormato }}</td>
+                        <td>{{ m.Stock }}</td>
+                        {% if user.is_authenticated %}
+                            {% if user.IdRol.Descripcion == "Administrador" %}
+                        <td> 
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-primary btn-sm mr-1" href="{% url 'MIM_editar' m.IdMIM %}" role="button" title="Editar">
+                                  <i class="fas fa-pen"></i>
+                                </a>
+                                |
+                                <a class="btn btn-danger btn-sm ml-1" href="{% url 'MIM_eliminar' m.IdMIM %}" role="button" title="Eliminar">
+                                  <i class="fas fa-trash"></i>
+                                </a>
+                              </div>
+                        </td>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

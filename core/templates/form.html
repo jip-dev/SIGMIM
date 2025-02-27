@@ -1,0 +1,36 @@
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% if field.name == 'Documento' %}
+                <input type="text" id="id_Documento" class="form-control" name="{{ field.name }}" maxlength="10"
+                autocomplete="off" value="{{ field.value|default_if_none:'' }}" required>
+            {% else %}
+                {{ field }}
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let documentoInput = document.getElementById('id_Documento');
+
+            // Configuración de la máscara del documento
+            documentoInput.addEventListener('input', function (e) {
+                let value = this.value.toUpperCase().replace(/[^VEJG0-9]/g, '');  // Solo permite V, E, J y números
+                if (value.length > 1) {
+                    value = value.replace(/^([VEJG]?)-?(\d{0,8})$/, function (match, letter, number) {
+                        letter = letter || 'V';  // Valor por defecto 'V'
+                        return letter + '-' + number;
+                    });
+                }
+                this.value = value;
+            });
+            
+        });
+    </script>
+
+    <button type="submit" class="btn btn-primary mt-3"><strong>Guardar</strong></button>
+</form>

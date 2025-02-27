@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block titulo %}SIGMIM | Solicitud{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <form method="GET">
+        <div class="row mb-3">
+            <div class="col-auto mt-2">
+                <label for="piso" class="form-label"><strong>Seleccionar Piso:</strong></label>
+            </div>
+            <div class="col">
+                <select name="piso" id="piso" class="col-4 form-control" onchange="this.form.submit()">
+                    <option value="0" {% if piso_seleccionado == "0" %}selected{% endif %}>Todos</option>
+                    {% for piso in pisos %}
+                        <option value="{{ piso.IdPiso }}" {% if piso_seleccionado == piso.IdPiso|stringformat:"s" %}selected{% endif %}>
+                            {{ piso.Descripcion }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        {% if departamentos %}
+            {% for departamento in departamentos %}
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm mb-3 
+                    {% if departamento.IdEstadoDpto.IdEstadoDpto == 2 %} border-warning
+                    {% else %} border-success  
+                    {% endif %}">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-building"></i> 
+                            Dpto: {{ departamento.Departamento }}
+                        </h5>
+                        <p class="card-text">
+                            <strong>Piso:</strong> {{ departamento.IdPiso.Descripcion }} <br>
+                            <strong>Estado:</strong> {{ departamento.IdEstadoDpto.Descripcion }}
+                        </p>
+                        <a href="{% if departamento.IdEstadoDpto.IdEstadoDpto == 2 %}
+                                    {% url 'detalle_despacho' departamento.IdDpto %}
+                                 {% else %}
+                                    {% url 'detalle_solicitud' departamento.IdDpto %}
+                                 {% endif %}" 
+                           class="btn 
+                           {% if departamento.IdEstadoDpto.IdEstadoDpto == 2 %} btn-warning
+                           {% else %} btn-success 
+                           {% endif %} 
+                           w-100">
+                           {% if departamento.IdEstadoDpto.IdEstadoDpto == 2 %} Despachar 
+                           {% else %} Solicitar {% endif %}
+                           &nbsp; <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>            
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="alert alert-warning">No hay departamentos disponibles para este piso.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

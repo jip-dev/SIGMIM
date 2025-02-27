@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block titulo %} SIGMIM | Almacén {% endblock %}
+
+{% block contenido %}   
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-dark">
+        <h5 class="m-0 font-weight-bold text-white text-center">Registrar Nuevo Suministro</h5>
+    </div>
+    <div class="card-body">
+        <h4>Información del Suministro</h4>
+        <form method="POST" id="suministro-form">
+            {% csrf_token %}
+        <div class="form-row d-flex">
+            <!-- Selección del Proveedor -->
+            <div class="col">
+                <label for="proveedor">Proveedor:</label>
+                <select name="proveedor" id="proveedor" class="form-control" required>
+                    <option value="" disabled selected>Seleccione un Proveedor</option>
+                    {% for proveedor in proveedores %}
+                        <option value="{{ proveedor.IdProveedor }}" 
+                                data-documento="{{ proveedor.Documento }}">
+                            {{ proveedor.RazonSocial }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Documento del Proveedor -->
+            <div class="col">
+                <label for="documento_proveedor">Documento:</label>
+                <input type="text" id="documento_proveedor" class="form-control" disabled>
+            </div>
+            <!-- Lote -->
+            <div class="col">
+                <label for="lote">Lote:</label>
+                <input type="text" name="lote" id="lote" class="form-control" placeholder="Lote" required>
+            </div>
+            <!-- Usuario Registrador -->
+            <div class="col">
+                <label for="usuario_registrador">Registrador:</label>
+                <input type="text" id="usuario_registrador" 
+                       class="form-control" disabled
+                       value="{{ request.user.first_name }} {{ request.user.last_name }} - {{ request.user.Documento }}">
+            </div>
+        </div>
+        
+        <!-- Detalle del Suministro -->
+        <h4 class="mt-4">Detalle del Suministro</h4>
+        <div class="form-row d-flex">
+            <!-- Buscar por Código -->
+            <div class="col">
+                <label for="codigo">Código:</label>
+                <select id="codigo" class="form-control">
+                    <option value="" disabled selected>Seleccione un Código</option>
+                    {% for mim in mim_list %}
+                        <option value="{{ mim.IdMIM }}" 
+                                data-nombre="{{ mim.Nombre }}"
+                                data-categoria="{{ mim.IdCategoria.Descripcion }}"
+                                data-formato="{{ mim.IdFormato.Descripcion }}">
+                            {{ mim.Cod }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- MIM -->
+            <div class="col">
+                <label for="mim">MIM:</label>
+                <select id="mim" class="form-control">
+                    <option value="" disabled selected>Seleccione un MIM</option>
+                    {% for mim in mim_list %}
+                        <option value="{{ mim.IdMIM }}" 
+                                data-codigo="{{ mim.Cod }}"
+                                data-categoria="{{ mim.IdCategoria.Descripcion }}"
+                                data-formato="{{ mim.IdFormato.Descripcion }}">
+                            {{ mim.Nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Categoría -->
+            <div class="col">
+                <label for="categoria">Categoría:</label>
+                <input type="text" id="categoria" class="form-control" disabled>
+            </div>
+            <!-- Formato -->
+            <div class="col">
+                <label for="formato">Formato:</label>
+                <input type="text" id="formato" class="form-control" disabled>
+            </div>
+        </div>
+        <div class="form-row mt-3 d-flex">
+            <!-- Fecha de Vencimiento -->
+            <div class="col">
+                <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+                <input type="date" id="fecha_vencimiento" class="form-control" required value="2199-12-31">
+            </div>
+            <!-- Cantidad -->
+            <div class="col">
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" class="form-control" min="1" placeholder="Cantidad" required>
+            </div>
+            <!-- Botón Agregar -->
+            <div class="col align-self-end">
+                <button type="button" id="agregar" class="btn btn-primary"><strong>Agregar</strong></button>
+            </div>
+        </div>
+        
+        <!-- Tabla de MIM Agregados -->
+        <div class="table-responsive">
+            <h4 class="mt-4">Detalle de Suministros Agregados</h4>
+            <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr class="text-center">
+                    <th>#</th>
+                    <th>MIM</th>
+                    <th>Categoría</th>
+                    <th>Formato</th>
+                    <th>Lote</th>
+                    <th>F. Vencimiento</th>
+                    <th>Cantidad</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="detalle-suministro">
+                <!-- Aquí se agregarán las filas dinámicamente -->
+            </tbody>
+            </table>        
+        </div>
+        
+        <!-- Botón Finalizar -->
+        <button type="button" id="finalizar" class="btn btn-success mt-3"><strong>Finalizar</strong></button>
+        </form>
+    </div>    
+</div>
+
+<script>
+// Mostrar el Documento del Proveedor seleccionado
+document.getElementById('proveedor').addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    document.getElementById('documento_proveedor').value = selectedOption.dataset.documento;
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let codigoSelect = document.getElementById("codigo");
+
+    // Inicializar Select2 con el estilo de Bootstrap
+    $(codigoSelect).select2({
+        width: "100%", // Asegura que el select se vea correctamente
+        theme: "bootstrap-5" // Aplica el tema de Bootstrap (necesita el CSS de Select2 para Bootstrap)
+    });
+
+    // Evento cuando se selecciona un código en Select2
+    $(codigoSelect).on("select2:select", function (e) {
+        let selectedOption = e.params.data.element;
+
+        if (selectedOption) {
+            document.getElementById("mim").value = selectedOption.value;
+            document.getElementById("categoria").value = selectedOption.dataset.categoria;
+            document.getElementById("formato").value = selectedOption.dataset.formato;
+        }
+    });
+
+    // Aplicar la clase "form-control" al contenedor de Select2
+    $(".select2-container").addClass("form-control");
+});
+
+
+
+// // Cuando se selecciona un código
+// document.getElementById('codigo').addEventListener('change', function () {
+//     const codigoSelect = this;
+//     const selectedOption = codigoSelect.options[codigoSelect.selectedIndex];
+
+//     // Obtener los valores del código seleccionado
+//     const mimId = selectedOption.value;
+//     const nombre = selectedOption.getAttribute('data-nombre');
+//     const categoria = selectedOption.getAttribute('data-categoria');
+//     const formato = selectedOption.getAttribute('data-formato');
+
+//     // Rellenar los valores relacionados
+//     document.getElementById('mim').value = mimId;
+//     document.getElementById('categoria').value = categoria;
+//     document.getElementById('formato').value = formato;
+// });
+
+// Cuando se selecciona un MIM
+document.getElementById('mim').addEventListener('change', function () {
+    const mimSelect = this;
+    const selectedOption = mimSelect.options[mimSelect.selectedIndex];
+
+    // Obtener los valores del MIM seleccionado
+    const codigo = selectedOption.getAttribute('data-codigo');
+    const categoria = selectedOption.getAttribute('data-categoria');
+    const formato = selectedOption.getAttribute('data-formato');
+
+    // Rellenar los valores relacionados
+    document.getElementById('codigo').value = selectedOption.value;
+    document.getElementById('categoria').value = categoria;
+    document.getElementById('formato').value = formato;
+});
+
+// Agregar el MIM seleccionado a la tabla
+document.getElementById('agregar').addEventListener('click', function () {
+    const codigoSelect = document.getElementById('codigo');
+    const mimSelect = document.getElementById('mim');
+    const categoriaInput = document.getElementById('categoria');
+    const formatoInput = document.getElementById('formato');
+    const loteInput = document.getElementById('lote');
+    const fechaVencimientoInput = document.getElementById('fecha_vencimiento');
+    const cantidadInput = document.getElementById('cantidad');
+
+    if (!mimSelect.value || !loteInput.value || !fechaVencimientoInput.value || !cantidadInput.value || cantidadInput.value <= 0) {
+        alert('Debe completar todos los campos correctamente.');
+        return;
+    }
+
+    // Crear una nueva fila en la tabla
+    const tableBody = document.getElementById('detalle-suministro');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td class="text-center">
+            <input type="hidden" name="detalle_codigo[]" value="${codigoSelect.value}">
+            ${codigoSelect.options[codigoSelect.selectedIndex].text}
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="detalle_mim[]" value="${mimSelect.value}">
+            ${mimSelect.options[mimSelect.selectedIndex].text}
+        </td>
+        <td class="text-center">${categoriaInput.value}</td>
+        <td class="text-center">${formatoInput.value}</td>
+        <td class="text-center">
+            <input type="hidden" name="lote_${mimSelect.value}" value="${loteInput.value}">
+            ${loteInput.value}
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="fecha_vencimiento_${mimSelect.value}" value="${fechaVencimientoInput.value}">
+            ${fechaVencimientoInput.value}
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="cantidad_${mimSelect.value}" value="${cantidadInput.value}">
+            ${cantidadInput.value}
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm eliminar"><i class="fas fa-trash"></i></button>
+        </td>
+    `;
+    tableBody.appendChild(row);
+
+    // Limpiar campos
+    codigoSelect.value = '';
+    mimSelect.value = '';
+    categoriaInput.value = '';
+    formatoInput.value = '';
+    fechaVencimientoInput.value = '2199-12-31';  // Restablecer al valor por defecto
+    cantidadInput.value = '';
+});
+
+// Eliminar filas de la tabla
+document.getElementById('detalle-suministro').addEventListener('click', function (e) {
+    if (e.target.classList.contains('eliminar')) {
+        e.target.closest('tr').remove();
+    }
+});
+
+// Enviar el formulario
+document.getElementById('finalizar').addEventListener('click', function () {
+        const tableBody = document.getElementById('detalle-suministro');
+        if (tableBody.rows.length === 0) {
+            alert('Debe agregar al menos un MIM antes de finalizar.');
+            return;
+        }
+
+        // Enviar el formulario
+        document.getElementById('suministro-form').submit();
+    });
+</script>
+    
+{% endblock %}

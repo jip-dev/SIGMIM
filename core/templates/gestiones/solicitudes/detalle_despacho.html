@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block titulo %} SIGMIM | Despacho {% endblock %}
+
+{% block contenido %}
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-dark">
+        <h5 class="m-0 mt-2 font-weight-bold text-white text-center">Detalle del Despacho</h5>
+    </div>
+    <div class="card-body">
+        <h4>Detalle del Departamento</h4>
+        <form method="POST" id="solicitud-form">
+            {% csrf_token %}
+            <div class="form-row d-flex">
+                <div class="col">
+                    <label for="departamento">Departamento:</label>
+                    <input type="text" id="departamento" class="form-control" value="{{ departamento.Departamento }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="jefe_dpto">Jefe Dpto.:</label>
+                    <input type="text" id="jefe_dpto" class="form-control" value="{{ departamento.JefeDpto }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="piso">Piso:</label>
+                    <input type="text" id="piso" class="form-control" value="{{ departamento.IdPiso.Descripcion }}" disabled>
+                </div>
+                <div class="col">
+                    <label for="usuario_registrador">Registrador:</label>
+                    <input type="text" id="usuario_registrador" class="form-control" disabled
+                           value="{{ request.user.first_name }} {{ request.user.last_name }} - {{ request.user.Documento }}">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <h4 class="mt-4">Detalle de Suministros Agregados</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="text-center">
+                            <th>#</th>
+                            <th>MIM</th>
+                            <th>Categoría</th>
+                            <th>Formato</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ds in detalles_solicitud %}
+                        <tr class="text-center">
+                            <td>{{ ds.IdMIM.Cod }}</td>
+                            <td>{{ ds.IdMIM.Nombre }}</td>
+                            <td>{{ ds.IdMIM.IdCategoria }}</td>
+                            <td>{{ ds.IdMIM.IdFormato }}</td>
+                            <td>{{ ds.CantidadSolicitada }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                {% if user.is_authenticated %}
+                    {% if not user.IdRol.Descripcion == "Usuario" %}
+                <button type="submit" name="finalizar" class="btn btn-success mr-2"><strong>Finalizar Despacho</strong></button>
+                    {% endif %}
+                {% endif %}
+                <button type="submit" name="cancelar" class="btn btn-danger"><strong>Cancelar Solicitud</strong></button>
+            </form>
+        </form>
+    </div>    
+</div>
+
+{% endblock %}
